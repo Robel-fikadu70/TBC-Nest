@@ -1,7 +1,9 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, ParseIntPipe, ValidationPipe } from '@nestjs/common';
 import { TaskService } from './task.service';
+import { CreateTaskDTO } from './dto/create-task.dto';
+import { UpdateTaskDTO } from './dto/update-task.dto';
 
-@Controller('tasks') // /task
+@Controller('tasks') 
 export class TaskController {
     constructor(private readonly taskService: TaskService){}
     /* 
@@ -12,31 +14,29 @@ export class TaskController {
     DELETE /tsks/:id CKECK
     */
 
-
-    
     @Get()  // /task or /task?status=value 
     getAllTasks(@Query('status') status?: 'PENDING' | 'IN-PROGRESS' | 'DONE') {
         return this.taskService.getAllTasks(status);
     }
 
     @Get(':id')
-    getTaskbyID(@Param('id') id: string){
-        return this.taskService.getTaskbyID(+id)
+    getTaskbyID(@Param('id', ParseIntPipe) id: number){
+        return this.taskService.getTaskbyID(id)
     }
 
     @Post()
-    createTask(@Body() task: {title: string, description: string}){
+    createTask(@Body(ValidationPipe) task: CreateTaskDTO){
         return this.taskService.createTask(task)
     }
 
     @Patch(':id')
-    updateTask(@Param('id') id: string, @Body() taskUpdate: {title?: string, description?: string, status?: 'PENDING' | 'IN-PROGRESS' | 'DONE'}){
-        return this.taskService.updateTask(+id, taskUpdate)
+    updateTask(@Param('id', ParseIntPipe) id: number, @Body(ValidationPipe) taskUpdate: UpdateTaskDTO){
+        return this.taskService.updateTask(id, taskUpdate)
     }
 
     @Delete(':id')
-    deleteTask(@Param('id') id: string){
-        return this.taskService.deleteTask(+id)
+    deleteTask(@Param('id', ParseIntPipe) id: number){
+        return this.taskService.deleteTask(id)
     }
 
 

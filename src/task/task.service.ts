@@ -32,7 +32,9 @@ export class TaskService {
 
     getAllTasks(status?: "PENDING" | "IN-PROGRESS" | "DONE"){
         if(status){
-            return this.tasks.filter(task => task.status === status)
+            const taskArray =  this.tasks.filter(task => task.status === status)
+            if(taskArray.length === 0 ) throw new NotFoundException("Status not found")
+            return taskArray
         }
 
         return this.tasks
