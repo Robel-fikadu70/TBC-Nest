@@ -1,4 +1,4 @@
-import {  IsEmpty, IsEnum, IsString, IsNotEmpty } from "class-validator";
+import {  IsEmpty, IsEnum, IsString, IsNotEmpty, IsOptional } from "class-validator";
 
 export class CreateTaskDTO {
 
@@ -6,9 +6,11 @@ export class CreateTaskDTO {
     @IsNotEmpty()
     title: string;
 
+    
     @IsString()
     description: string;
 
+    @IsOptional()
     @IsEnum(["PENDING","IN-PROGRESS","DONE"], {
         message: "Valid Status Required"
     })
