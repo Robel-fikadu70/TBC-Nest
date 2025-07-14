@@ -16,8 +16,8 @@ This is a simple RESTful backend application built using **NestJS** for the **TB
 
 ## 📄 API Documentation
 
-- [🔍 HTML Walkthrough](./api-doc.html)
-- [📤 Postman Collection](./TBC_Task_API.postman_collection.json)
+- [🔍 HTML Walkthrough](./API_DOC.html)
+- [📤 Postman Collection](./NEST-TASK.postman_collection.json)
 
 Use the Postman collection to test all available routes.
 
