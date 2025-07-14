@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Manager API Documentation</title>
+    <style>
+        :root {
+            --primary-color: #e0234e; /* NestJS-like red */
+            --secondary-color: #6c757d;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+            --warning-color: #ffc107;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            --code-font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+            --border-radius: 6px;
+        }
+
+        body {
+            font-family: var(--font-family);
+            line-height: 1.6;
+            margin: 0;
+            background-color: var(--light-color);
+            color: var(--dark-color);
+            display: flex;
+        }
+
+        #sidebar {
+            width: 260px;
+            background-color: #fff;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 20px;
+            border-right: 1px solid #dee2e6;
+            position: fixed;
+            top: 0;
+            left: 0;
+        }
+
+        #sidebar h2 {
+            margin-top: 0;
+            color: var(--primary-color);
+            font-size: 1.5em;
+            font-weight: 600;
+        }
+
+        #sidebar ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        #sidebar > ul > li > a {
+            font-weight: bold;
+            color: var(--dark-color);
+            text-decoration: none;
+            display: block;
+            padding: 8px 0;
+            font-size: 1.1em;
+        }
+        #sidebar > ul > li > ul {
+            padding-left: 15px;
+        }
+
+        #sidebar ul li a {
+            color: #555;
+            text-decoration: none;
+            display: block;
+            padding: 5px 0;
+            font-size: 0.95em;
+            transition: color 0.2s;
+        }
+
+        #sidebar ul li a:hover {
+            color: var(--primary-color);
+        }
+        
+        #main-content {
+            margin-left: 300px;
+            padding: 25px;
+            width: calc(100% - 300px);
+        }
+
+        .endpoint-section {
+            margin-bottom: 50px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #eee;
+        }
+        .endpoint-section:last-child { border-bottom: none; }
+
+        .endpoint {
+            background-color: #fff;
+            padding: 20px;
+            border: 1px solid #e9ecef;
+            border-radius: var(--border-radius);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+        }
+
+        .endpoint-title {
+            font-size: 1.4em;
+            margin-bottom: 15px;
+            color: var(--dark-color);
+            font-weight: 500;
+        }
+        .endpoint-title code {
+            font-size: 1.1em;
+            font-weight: 600;
+        }
+
+        .method {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: var(--border-radius);
+            color: #fff;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 0.8em;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+
+        .method-post { background-color: var(--success-color); }
+        .method-get { background-color: #007bff; }
+        .method-patch { background-color: var(--warning-color); color: var(--dark-color) !important; }
+        .method-delete { background-color: var(--danger-color); }
+
+        h1, h3, h4 {
+            color: var(--dark-color);
+            font-weight: 600;
+        }
+        h1 { font-size: 2.2em; margin-bottom: 20px; border-bottom: 1px solid #ccc; padding-bottom: 10px;}
+        h3 { font-size: 1.3em; margin-top: 25px; margin-bottom: 10px; color: var(--primary-color);}
+        h4 { font-size: 1.1em; margin-top: 20px; margin-bottom: 8px; color: var(--secondary-color); font-weight: 500;}
+
+        code {
+            background-color: #e9ecef;
+            padding: 0.2em 0.4em;
+            margin: 0;
+            font-size: 85%;
+            border-radius: 3px;
+            font-family: var(--code-font-family);
+        }
+
+        pre {
+            background-color: #212529;
+            color: #000000;
+            padding: 15px;
+            border-radius: var(--border-radius);
+            overflow-x: auto;
+            font-family: var(--code-font-family);
+            font-size: 0.9em;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            margin-bottom: 20px;
+            font-size: 0.95em;
+        }
+        th, td { border: 1px solid #dee2e6; padding: 10px; text-align: left; }
+        th { background-color: #f8f9fa; font-weight: 600; }
+
+        .response-block {
+            margin-top: 15px;
+            padding-left: 15px;
+            border-left: 3px solid #e9ecef;
+        }
+        .status-200, .status-201, .status-204 { border-left-color: var(--success-color); }
+        .status-400, .status-404 { border-left-color: var(--danger-color); }
+        .status-500 { border-left-color: var(--warning-color); }
+        
+        .status-code { font-weight: bold; font-size: 1.05em; }
+        .status-200 .status-code, .status-201 .status-code, .status-204 .status-code { color: var(--success-color); }
+        .status-400 .status-code, .status-404 .status-code { color: var(--danger-color); }
+
+        @media (max-width: 768px) {
+            body { flex-direction: column; }
+            #sidebar { position: static; width: 100%; height: auto; border-right: none; border-bottom: 1px solid #dee2e6; }
+            #main-content { margin-left: 0; width: 100%; padding: 15px; }
+        }
+    </style>
+</head>
+<body>
+    <nav id="sidebar">
+        <h2>Task Manager API</h2>
+        <ul>
+            <li><a href="#general">General Information</a></li>
+            <li>
+                <a href="#task-endpoints">Task Endpoints</a>
+                <ul>
+                    <li><a href="#ep-get-all-tasks">Get All Tasks</a></li>
+                    <li><a href="#ep-get-task-by-id">Get Task by ID</a></li>
+                    <li><a href="#ep-create-task">Create a Task</a></li>
+                    <li><a href="#ep-update-task">Update a Task</a></li>
+                    <li><a href="#ep-delete-task">Delete a Task</a></li>
+                </ul>
+            </li>
+        </ul>
+    </nav>
+
+    <main id="main-content">
+        <section id="general" class="endpoint-section">
+            <h1>General Information</h1>
+            <h3>Base URL</h3>
+            <p>All API endpoints are relative to the following base URL. Since this is a local development API, the port may vary.</p>
+            <pre><code>http://localhost:3000</code></pre>
+
+            <h3>The Task Object</h3>
+            <p>The core resource of this API is the Task object, which has the following structure:</p>
+            <pre><code>{
+    "id": 2,
+    "title": "Task Two",
+    "description": "Finish the project",
+    "status": "IN_PROGRESS"
+}</code></pre>
+
+            <h3>Task Statuses</h3>
+            <p>The <code>status</code> field can have one of the following values:</p>
+            <ul>
+                <li><code>PENDING</code> - The default status when a task is created.</li>
+                <li><code>IN-PROGRESS</code> - The task is actively being worked on. </li>
+                <li><code>DONE</code> - The task has been completed.</li>
+            </ul>
+
+            <h3>Error Responses</h3>
+            <p>When an error occurs (e.g., a resource is not found), the API will return a JSON object in the standard NestJS format:</p>
+            <pre><code>{
+    "statusCode": 404,
+    "message": "Task with ID '99' not found",
+    "error": "Not Found"
+}</code></pre>
+        </section>
+
+        <section id="task-endpoints" class="endpoint-section">
+            <h1>Task Endpoints</h1>
+
+            <article id="ep-get-all-tasks" class="endpoint">
+                <h2 class="endpoint-title"><span class="method method-get">GET</span><code>/tasks</code></h2>
+                <p>Retrieves a list of all tasks. Can be filtered by providing a <code>status</code> value in the query string.</p>
+                
+                <h4>Query Parameters</h4>
+                <table>
+                    <thead><tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+                    <tbody>
+                        <tr>
+                          <td><code>status</code></td>
+                          <td>String</td>
+                          <td>Optional</td>
+                          <td>Filters tasks by status. Example: <code>?status=PENDING</code>. Allowed values: <code>PENDING</code>, <code>IN-PROGRESS</code>, <code>DONE</code>.</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <h4>Example Request</h4>
+                <p>To get all tasks that are pending:</p>
+                <pre><code>GET /tasks?status=PENDING</code></pre>
+
+                <h4>Responses</h4>
+                <div class="response-block status-200">
+                    <p><span class="status-code">200 OK</span> - A list of tasks.</p>
+                    <pre><code>[
+    {
+        "id": 1,
+        "title": "Task One",
+        "description": "Clean Room",
+        "status": "DONE"
+    },
+    {
+        "id": 2,
+        "title": "Task Two",
+        "description": "Finish the project",
+        "status": "IN-PROGRESS"
+    },
+    {
+        "id": 3,
+        "title": "Task Three",
+        "description": "Visit Granny",
+        "status": "PENDING"
+    },
+    {
+        "id": 4,
+        "title": "Task Four",
+        "description": "Buy Groceries",
+        "status": "PENDING"
+    }
+]</code></pre>
+                </div>
+            </article>
+
+            <article id="ep-get-task-by-id" class="endpoint">
+                <h2 class="endpoint-title"><span class="method method-get">GET</span><code>/tasks/:id</code></h2>
+                <p>Retrieves a single task by its unique ID.</p>
+                
+                <h4>Path Parameters</h4>
+                <table>
+                    <thead><tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+                    <tbody>
+                        <tr><td><code>id</code></td><td>Number</td><td>Required</td><td>The unique identifier of the task.</td></tr>
+                    </tbody>
+                </table>
+
+                <h4>Responses</h4>
+                <div class="response-block status-200">
+                    <p><span class="status-code">200 OK</span> - The requested task object.</p>
+                    <pre><code>{
+    "id": 2,
+    "title": "Task Two",
+    "description": "Finish the project",
+    "status": "IN-PROGRESS"
+}</code></pre>
+                </div>
+                <div class="response-block status-404">
+                    <p><span class="status-code">404 Not Found</span> - The task with the specified ID does not exist.</p>
+                    <pre><code>{
+    "statusCode": 404,
+    "message": "Task with ID '99' not found",
+    "error": "Not Found"
+}</code></pre>
+                </div>
+            </article>
+
+            <article id="ep-create-task" class="endpoint">
+                <h2 class="endpoint-title"><span class="method method-post">POST</span><code>/tasks</code></h2>
+                <p>Creates a new task. The ID is automatically generated, and the status defaults to <code>PENDING</code>.</p>
+                
+                <h4>Request Body (<code>application/json</code>)</h4>
+                <table>
+                    <thead><tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+                    <tbody>
+                        <tr><td><code>title</code></td><td>String</td><td>Required</td><td>The title of the task.</td></tr>
+                        <tr><td><code>description</code></td><td>String</td><td>Required</td><td>A detailed description of the task.</td></tr>
+                    </tbody>
+                </table>
+                
+                <h4>Example Request</h4>
+                <pre><code>{
+    "title": "Task Five",
+    "description": "Prepare for the presentation"
+}</code></pre>
+
+                <h4>Responses</h4>
+                <div class="response-block status-201">
+                    <p><span class="status-code">201 Created</span> - The newly created task object.</p>
+                    <pre><code>{
+    "id": 5,
+    "title": "Task Five",
+    "description": "Prepare for the presentation",
+    "status": "PENDING"
+}</code></pre>
+                </div>
+                 <div class="response-block status-400">
+                    <p><span class="status-code">400 Bad Request</span> - Required fields are missing or invalid.</p>
+                    <pre><code>{
+    "statusCode": 400,
+    "message": [
+        "title should not be empty",
+        "description should not be empty"
+    ],
+    "error": "Bad Request"
+}</code></pre>
+                </div>
+            </article>
+
+            <article id="ep-update-task" class="endpoint">
+                <h2 class="endpoint-title"><span class="method method-patch">PATCH</span><code>/tasks/:id</code></h2>
+                <p>Updates a task's title, description, or status. Only include the fields you want to change.</p>
+                
+                <h4>Path Parameters</h4>
+                <table>
+                    <thead><tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+                    <tbody>
+                        <tr><td><code>id</code></td><td>Number</td><td>Required</td><td>The unique identifier of the task to update.</td></tr>
+                    </tbody>
+                </table>
+                
+                <h4>Request Body (<code>application/json</code>)</h4>
+                 <table>
+                    <thead><tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+                    <tbody>
+                        <tr><td><code>title</code></td><td>String</td><td>Optional</td><td>The new title of the task.</td></tr>
+                        <tr><td><code>description</code></td><td>String</td><td>Optional</td><td>The new description of the task.</td></tr>
+                        <tr><td><code>status</code></td><td>String</td><td>Optional</td><td>The new status. Must be one of: <code>PENDING</code>, <code>IN-PROGRESS</code>, <code>DONE</code>.</td></tr>
+                    </tbody>
+                </table>
+
+                <h4>Example Request</h4>
+                <p>To update the status of task with ID 3:</p>
+                <pre><code>{
+    "status": "IN-PROGRESS"
+}</code></pre>
+
+                <h4>Responses</h4>
+                <div class="response-block status-200">
+                    <p><span class="status-code">200 OK</span> - The updated task object.</p>
+                    <pre><code>{
+    "id": 3,
+    "title": "Task Three",
+    "description": "Visit Granny",
+    "status": "IN-PROGRESS"
+}</code></pre>
+                </div>
+                 <div class="response-block status-400">
+                    <p><span class="status-code">400 Bad Request</span> - The provided status is invalid.</p>
+                    <pre><code>{
+    "statusCode": 400,
+    "message": "Validation failed (enum #status has an invalid value 'INVALID_STATUS')",
+    "error": "Bad Request"
+}</code></pre>
+                </div>
+                <div class="response-block status-404">
+                    <p><span class="status-code">404 Not Found</span> - The task with the specified ID does not exist.</p>
+                </div>
+            </article>
+
+            <article id="ep-delete-task" class="endpoint">
+                <h2 class="endpoint-title"><span class="method method-delete">DELETE</span><code>/tasks/:id</code></h2>
+                <p>Deletes a task by its unique ID.</p>
+                
+                <h4>Path Parameters</h4>
+                <table>
+                    <thead><tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+                    <tbody>
+                        <tr><td><code>id</code></td><td>Number</td><td>Required</td><td>The unique identifier of the task to delete.</td></tr>
+                    </tbody>
+                </table>
+
+                <h4>Responses</h4>
+                <div class="response-block status-204">
+                    <p><span class="status-code">204 No Content</span> - The task was successfully deleted. No response body is returned.</p>
+                </div>
+                <div class="response-block status-404">
+                    <p><span class="status-code">404 Not Found</span> - The task with the specified ID does not exist.</p>
+                    <pre><code>{
+    "statusCode": 404,
+    "message": "Task with ID '99' not found",
+    "error": "Not Found"
+}</code></pre>
+                </div>
+            </article>
+
+        </section>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Smooth scrolling for sidebar links
+            const sidebarLinks = document.querySelectorAll('#sidebar a[href^="#"]');
+            
+            sidebarLinks.forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+                    
+                    if (targetElement) {
+                        targetElement.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
