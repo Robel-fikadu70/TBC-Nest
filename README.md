@@ -29,7 +29,7 @@ Use the Postman collection to test all available routes.
 ## 📤 Submission Notes
 
 - All test requests are documented in the Postman collection
-- API code walkthrough is included in `api-doc.html`
+- API code walkthrough is included in `API_DOC.html`
 - This project was built as part of the TBC internship technical assignment
 
 ---
